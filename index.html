@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>银河全景图</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.0.0/openseadragon.min.js"></script>
+    <style>
+        #galaxy-viewer {
+            width: 100%;
+            height: 100vh;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div id="galaxy-viewer"></div>
+    <script>
+        var viewer = OpenSeadragon({
+            id: "galaxy-viewer",
+            prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.0.0/images/",
+            tileSources: {
+                Image: {
+                    xmlns: "http://schemas.microsoft.com/deepzoom/2008",
+                    Url: "output_webp/",
+                    Format: "webp",
+                    Overlap: "0",
+                    TileSize: "1024",
+                    Size: {
+                        Width: "131072",
+                        Height: "131072"
+                    }
+                }
+            },
+            showNavigator: true,
+            tileSources: new OpenSeadragon.DziTileSource({
+                width: 131072,
+                height: 131072,
+                tileSize: 1024,
+                tileOverlap: 0,
+                minLevel: 0,
+                maxLevel: 7,
+                getTileUrl: function(level, x, y) {
+                    return `output_webp/${level}/${y}/${x}.webp`;
+                }
+            }),
+            tileFailed: function(event) {
+                const errorInfo = {
+                    level: event.level,
+                    x: event.x,
+                    y: event.y,
+                    url: `output_webp/${event.level}/${event.x}/${event.y}.webp`,
+                    error: event.message,
+                    timestamp: new Date().toISOString()
+                };
+                //console.error('切片加载失败详情:', errorInfo);
+                //alert(`切片加载失败，请检查:\n层级: ${event.level}\nX坐标: ${event.x}\nY坐标: ${event.y}\n路径: ${errorInfo.url}`);
+            },
+            ajaxWithCredentials: false,
+            crossOriginPolicy: 'Anonymous',
+            loadTilesWithAjax: true
+        });
+
+        viewer.addHandler('open-failed', function(event) {
+            //console.error('加载失败:', event);
+            //alert('图像加载失败');
+        });
+        
+        viewer.addHandler('open', function() {
+            //console.log('加载成功');
+        });
+    </script>
+</body>
+</html>
